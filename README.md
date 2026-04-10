@@ -1,7 +1,7 @@
 <div align="center">
   <img src="statics/baobab-broadleaf.PNG" width="120" alt="BroadLeaf logo — baobab tree"/>
   <h1>BroadLeaf</h1>
-  <p><em>Structured JSONL logging — local-first, cloud-ready.</em></p>
+  <p><em>Structured JSONL Logging</em></p>
 </div>
 
 ---
@@ -10,10 +10,14 @@
 
 BroadLeaf is a lightweight structured logging library for Python services and pipelines. Every log call produces a single, self-contained JSON Lines record. No external dependencies. Async drain thread so callers never wait on I/O.
 
+Implemented as local in first dry runs, but scaffolding in place so there should be sinks in place that are cloud-ready.
+
 ```jsonl
 {"ts":"2026-04-09T11:04:22.103Z","level":"INFO","component":"receiver","event":"batch_received","batch_id":"abc123","sample_count":864}
 {"ts":"2026-04-09T11:04:22.218Z","level":"INFO","component":"inference","event":"predict","prediction":"shake","confidence":0.71,"latency_ms":12.4,"batch_id":"abc123","weights":"v1.pt"}
 ```
+
+NOTE: On inception, was going to call the library _Baobab_ as a riff on the logical progression of **log** to **tree**, but pronunciation questions surfaced right away. The compromise was **BroadLeaf**, the category of deciduous trees in wich the _Baobab_ tree resides. This name fits, as there is a lot of data carried in the trunk but the branches and leaf structures are not just interesting but key as well.
 
 ---
 
@@ -52,7 +56,7 @@ log.warn("queue_pressure", depth=8200, capacity=10000)
 log.error("write_failed", path="/data/batches/abc123.json", reason="disk full")
 ```
 
-`get_logger()` can be called before `configure()` — the sink is lazily initialised on the first record that drains. Subsequent `configure()` calls propagate immediately to all existing loggers.
+`get_logger()` can be called before `configure()` — the sink is lazily initialized on the first record that drains. Subsequent `configure()` calls propagate immediately to all existing loggers.
 
 ---
 
@@ -240,3 +244,11 @@ broadleaf/
 │   └── test_logger.py
 └── pyproject.toml
 ```
+
+#### REFERNCES
+
+This project was designed as a purpose built level up logger library to enable a more modern, durable approach to log traces - still enabling fine grain meta data content control. 
+
+Initial bring up was related to building out inference pathways in the areas of fine tuning model implementations plus follow up passes and iterations to test and train - including key steps like determinations of weights as downstream model inputs.
+
+JMW:wec
