@@ -47,7 +47,7 @@ class FileSink(Sink):
         if self._file and self._file.tell() >= self._max_bytes:
             self._file.close()
             ts = datetime.now(timezone.utc).strftime("%H%M%S")
-            path = self._dir / f"{self._current_date}_broadleaf_{ts}.jsonl"
+            path = self._dir / f"{self._current_date}_{ts}_broadleaf.jsonl"
             self._file = open(path, "a", buffering=1, encoding="utf-8")
 
     # ------------------------------------------------------------------ #
