@@ -250,6 +250,6 @@ Initial bring up was related to building out inference pathways in the areas of 
 
 - Library Name
 
-NOTE: On inception, was interested to call the library _Baobab_ to mix it beyond a reference *log* and instead shift into *tree* terms. With *baobab*, pronunciation questions surfaced right away. The compromise was **BroadLeaf**, the category of deciduous trees in which the _Baobab_ tree resides. This name fits, as there is a lot of data carried in the unique trunk but the branches and leaf structures are not just interesting but key as well.
+NOTE: On inception, was interested to call the library _Baobab_ to mix it beyond the usual reference to a *log* and instead shift into the broader set of *tree* terms. With *baobab*, pronunciation questions surfaced right away. The compromise was **BroadLeaf**, the category of deciduous trees in which the _Baobab_ tree resides. This name fits, as there is a lot of data carried in the unique trunk but the branches and leaf structures are not just interesting but key as well.
 
 /jmw
