@@ -160,7 +160,30 @@ recent = reader.tail(n=20, component="inference")
 | `search` | `str` | Case-insensitive substring across the full JSON line |
 | `since` | `datetime` | Records at or after this timestamp |
 | `until` | `datetime` | Records at or before this timestamp |
+| `predicate` | `Callable[[dict], bool]` | Arbitrary filter applied after all named parameters |
 | `limit` | `int` | Stop after N matches (default 500; `None` = all) |
+
+### Predicate & Single-File Queries
+
+Use `predicate` for field-level checks the named filters don't cover. It receives the parsed record dict and runs after all other filters, so named filters eliminate rows first.
+
+```python
+# Low-confidence predictions from the last hour
+since = datetime.now(timezone.utc) - timedelta(hours=1)
+for rec in reader.query(
+    component="inference",
+    since=since,
+    predicate=lambda r: r.get("confidence", 1.0) < 0.5,
+):
+    print(rec["batch_id"], rec["confidence"])
+```
+
+To query a specific file rather than a directory, use `LogReader.from_file()`. All `query()` parameters work normally.
+
+```python
+reader = LogReader.from_file("logs/20260413_broadleaf.jsonl")
+errors = list(reader.query(level="ERROR", limit=None))
+```
 
 ---
 

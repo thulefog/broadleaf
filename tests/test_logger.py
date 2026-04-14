@@ -96,3 +96,30 @@ def test_reader_limit(tmp_log_dir):
     reader = LogReader(tmp_log_dir)
     results = list(reader.query(component="bulk", limit=5))
     assert len(results) == 5
+
+
+def test_reader_predicate(tmp_log_dir):
+    log = get_logger("model")
+    log.info("predict", confidence=0.9)
+    log.info("predict", confidence=0.3)
+    log.info("predict", confidence=0.7)
+    time.sleep(0.05)
+    reader = LogReader(tmp_log_dir)
+    low_conf = list(reader.query(predicate=lambda r: r.get("confidence", 1.0) < 0.5))
+    assert len(low_conf) == 1
+    assert low_conf[0]["confidence"] == 0.3
+
+
+def test_reader_from_file(tmp_log_dir):
+    get_logger("svc").info("started")
+    get_logger("svc").warn("slow", latency_ms=950)
+    time.sleep(0.05)
+    jsonl_files = list(tmp_log_dir.glob("*_broadleaf*.jsonl"))
+    assert jsonl_files, "no log file written"
+    reader = LogReader.from_file(jsonl_files[0])
+    results = list(reader.query(limit=None))
+    assert any(r["event"] == "started" for r in results)
+    assert any(r["event"] == "slow" for r in results)
+    # directory-glob is bypassed — only records from this one file appear
+    warn_only = list(reader.query(level="WARN", limit=None))
+    assert all(r["level"] == "WARN" for r in warn_only)

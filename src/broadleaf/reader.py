@@ -22,12 +22,21 @@ Example::
 
     # Collect into a list (small result sets only)
     results = list(reader.query(component="receiver", event="batch_received", limit=50))
+
+    # Arbitrary predicate
+    for rec in reader.query(predicate=lambda r: r.get("confidence", 1.0) < 0.5):
+        print(rec)
+
+    # Load a single file directly
+    reader = LogReader.from_file("logs/2026-04-13_broadleaf.jsonl")
+    for rec in reader.query(level="ERROR"):
+        print(rec)
 """
 
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any, Callable, Generator
 
 from .level import Level
 
@@ -37,6 +46,15 @@ class LogReader:
 
     def __init__(self, log_dir: str | Path = "logs") -> None:
         self._dir = Path(log_dir)
+        self._file: Path | None = None
+
+    @classmethod
+    def from_file(cls, path: str | Path) -> "LogReader":
+        """Create a reader targeting a single JSONL file instead of a directory."""
+        reader = cls.__new__(cls)
+        reader._dir = Path(path).parent
+        reader._file = Path(path)
+        return reader
 
     # ------------------------------------------------------------------ #
     def query(
@@ -48,6 +66,7 @@ class LogReader:
         search: str | None = None,
         since: datetime | None = None,
         until: datetime | None = None,
+        predicate: Callable[[dict[str, Any]], bool] | None = None,
         limit: int | None = 500,
     ) -> Generator[dict[str, Any], None, None]:
         """
@@ -68,13 +87,19 @@ class LogReader:
             Only records at or after this timestamp (tz-aware recommended).
         until : datetime, optional
             Only records at or before this timestamp.
+        predicate : callable, optional
+            ``fn(record: dict) -> bool``.  Applied after all other filters.
+            Use for field-level checks that the named filters don't cover,
+            e.g. ``predicate=lambda r: r.get("confidence", 1.0) < 0.5``.
         limit : int, optional
             Stop after this many matches.  Default 500.  Pass None for all.
         """
         min_level = Level.from_str(level) if level else Level.TRACE
         count = 0
 
-        for path in sorted(self._dir.glob("*_broadleaf*.jsonl")):
+        paths = [self._file] if self._file is not None else sorted(self._dir.glob("*_broadleaf*.jsonl"))
+
+        for path in paths:
             with open(path, "r", encoding="utf-8") as f:
                 for raw in f:
                     raw = raw.strip()
@@ -86,6 +111,9 @@ class LogReader:
                         continue
 
                     if not self._matches(record, raw, component, min_level, event, search, since, until):
+                        continue
+
+                    if predicate is not None and not predicate(record):
                         continue
 
                     yield record
