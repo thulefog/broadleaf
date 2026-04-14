@@ -267,7 +267,9 @@ broadleaf/
 
 #### APPENDIX
 
-This project was designed as a purpose built level up logger library to enable a more modern, durable approach to log traces - still enabling fine grain meta data content control. 
+This project was designed and purpose built from the ground up as a logger library that supports levels in addition to other features enabled by using the JSON Lines approach.
+
+The objective is to enable a more modern, durable approach to log traces - still enabling fine grain meta data content control on *write*, and predicate filtering on *read*. 
 
 Initial bring up was related to building out inference pathways in the areas of fine tuning model implementations plus follow up passes and iterations to test and train - including key steps like determinations of weights as downstream model inputs.
 
